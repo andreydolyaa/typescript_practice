@@ -1,7 +1,7 @@
-import { Server } from "./core/Server";
+import { HttpServer } from "./core/HttpServer";
 import router from "./router";
 
-const server = new Server({
+const server = new HttpServer({
   port: 3000,
   router,
 });
