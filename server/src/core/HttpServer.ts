@@ -1,24 +1,23 @@
 import http from "http";
 import express, { Express, Router } from "express";
-import { WebSocketServer } from "ws";
 import cors from "cors";
 import logger from "./Logger";
 import { httpLoggerMiddleware } from "../middleware/httpLogger";
 import { WebsocketServer } from "./WebsocketServer";
 
-interface ServerOptions {
+type ServerConfig = {
   port: number;
   router: Router;
-}
+};
 
-export class HttpServer {
+export class HttpServer implements ServerConfig {
   app: Express;
   httpServer: http.Server;
-  router: Router;
-  port: number;
+  port: ServerConfig["port"];
+  router: ServerConfig["router"];
   websocketServer: WebsocketServer | null;
 
-  constructor(options: ServerOptions) {
+  constructor(options: ServerConfig) {
     this.app = express();
     this.httpServer = http.createServer(this.app);
     this.port = options.port;
@@ -28,14 +27,14 @@ export class HttpServer {
     this._init();
   }
 
-  _init() {
+  private _init() {
     this.app.use(express.json());
     this.app.use(this.router);
     this.app.use(cors());
     this.app.use(httpLoggerMiddleware);
   }
 
-  run() {
+  async run() {
     this.httpServer.listen(this.port, () => {
       logger.info(`http server started [${this.port}]`);
       try {
